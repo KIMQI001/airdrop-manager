@@ -1,0 +1,181 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>DAO Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Plus Jakarta Sans', 'sans-serif'],
+                    },
+                    boxShadow: {
+                        'card': '0 1px 3px 0 rgb(0 0 0 / 0.05), 0 1px 2px -1px rgb(0 0 0 / 0.05)',
+                        'card-hover': '0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1)',
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        body {
+            background: #f8f9fc;
+            min-height: 100vh;
+        }
+        .card {
+            background: white;
+            border: 1px solid #e5e7eb;
+            border-radius: 16px;
+            box-shadow: 0 1px 3px 0 rgb(0 0 0 / 0.05);
+        }
+        .input {
+            background: #f9fafb;
+            border: 1px solid #e5e7eb;
+            border-radius: 8px;
+            color: #111;
+            padding: 10px 14px;
+            width: 100%;
+            transition: all 0.2s;
+        }
+        .input:focus {
+            outline: none;
+            border-color: #6366f1;
+            box-shadow: 0 0 0 3px rgb(99 102 241 / 0.1);
+        }
+        .input::placeholder {
+            color: #9ca3af;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+            border: none;
+        }
+        .btn-primary {
+            background: #6366f1;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #4f46e5;
+        }
+        .btn-secondary {
+            background: #f3f4f6;
+            color: #4b5563;
+        }
+        .btn-secondary:hover {
+            background: #e5e7eb;
+            color: #111;
+        }
+    </style>
+</head>
+<body class="text-slate-800">
+    <div class="max-w-6xl mx-auto px-6 py-8">
+        <!-- Header -->
+        <header class="flex items-center justify-between mb-10">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center">
+                    <i data-lucide="hexagon" class="w-6 h-6 text-white"></i>
+                </div>
+                <div>
+                    <h1 class="text-2xl font-bold text-slate-900 tracking-tight">DAO Dashboard</h1>
+                    <p class="text-slate-500 text-sm">Airdrop Portfolio Tracker</p>
+                </div>
+            </div>
+            <div class="flex items-center gap-3">
+                <button onclick="showSettingsModal()" class="btn btn-secondary flex items-center gap-2">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    Settings
+                </button>
+                <button onclick="selectFolder()" class="btn btn-primary flex items-center gap-2">
+                    <i data-lucide="folder-open" class="w-4 h-4"></i>
+                    Select Folder
+                </button>
+            </div>
+        </header>
+
+        <!-- Treasury Stats -->
+        <div class="card p-6 mb-6 border-indigo-100 bg-gradient-to-br from-white to-indigo-50/30">
+            <div class="flex items-center justify-between">
+                <div>
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="wallet" class="w-4 h-4 text-indigo-600"></i>
+                        <span class="text-slate-500 text-sm font-medium">Treasury Balance</span>
+                    </div>
+                    <p id="total-balance" class="text-5xl font-bold tracking-tight text-slate-900">$0</p>
+                </div>
+                <div class="text-right">
+                    <div class="flex items-center justify-end gap-2 mb-2">
+                        <i data-lucide="layers" class="w-4 h-4 text-purple-600"></i>
+                        <span class="text-slate-500 text-sm">Projects</span>
+                    </div>
+                    <p id="project-count" class="text-3xl font-bold text-purple-600">0</p>
+                </div>
+            </div>
+        </div>
+
+        <!-- Main Grid -->
+        <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <!-- Projects -->
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="rocket" class="w-5 h-5 text-indigo-600"></i>
+                        <h2 class="text-lg font-semibold text-slate-900">Projects</h2>
+                    </div>
+                    <button onclick="showAddProjectModal()" class="text-indigo-600 hover:text-indigo-700 flex items-center gap-1 text-sm font-medium">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        Add
+                    </button>
+                </div>
+                <div id="projects-list" class="space-y-3 max-h-80 overflow-y-auto pr-2">
+                    <p class="text-slate-400 text-sm py-4 text-center">No projects yet</p>
+                </div>
+            </div>
+
+            <!-- Activity -->
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="activity" class="w-5 h-5 text-emerald-600"></i>
+                        <h2 class="text-lg font-semibold text-slate-900">Activity</h2>
+                    </div>
+                    <button onclick="showAddActivityModal()" class="text-indigo-600 hover:text-indigo-700 flex items-center gap-1 text-sm font-medium">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        Add
+                    </button>
+                </div>
+                <div id="activity-feed" class="space-y-3 max-h-80 overflow-y-auto pr-2">
+                    <p class="text-slate-400 text-sm py-4 text-center">No activity yet</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Modal -->
+    <div id="modal" class="fixed inset-0 bg-slate-900/50 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="card p-6 w-full max-w-md mx-4">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="modal-title" class="text-lg font-semibold text-slate-900">Modal</h3>
+                <button onclick="hideModal()" class="text-slate-400 hover:text-slate-600">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
+            <div id="modal-content"></div>
+        </div>
+    </div>
+
+    <script src="app-light.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
+</body>
+</html>
