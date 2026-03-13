@@ -7,13 +7,21 @@
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['Space Grotesk', 'sans-serif'],
+                        sans: ['DM Sans', 'sans-serif'],
+                    },
+                    colors: {
+                        surface: '#0d0d12',
+                        card: '#14141b',
+                        border: '#1f1f2e',
+                        accent: '#6366f1',
+                        'accent-hover': '#818cf8',
                     }
                 }
             }
@@ -21,115 +29,156 @@
     </script>
     <style>
         body {
-            background: #0a0a0f;
+            background: #0d0d12;
             min-height: 100vh;
         }
-        .gradient-border {
-            position: relative;
-            background: linear-gradient(#141419, #141419) padding-box,
-                        linear-gradient(135deg, #6366f1, #8b5cf6, #ec4899) border-box;
-            border: 1px solid transparent;
+        .card {
+            background: #14141b;
+            border: 1px solid #1f1f2e;
+            border-radius: 16px;
         }
-        .glow {
-            box-shadow: 0 0 40px rgba(99, 102, 241, 0.15);
+        .glow-accent {
+            box-shadow: 0 0 60px rgba(99, 102, 241, 0.15);
+        }
+        .input {
+            background: #0d0d12;
+            border: 1px solid #1f1f2e;
+            border-radius: 8px;
+            color: #fff;
+            padding: 10px 14px;
+            width: 100%;
+            transition: border-color 0.2s;
+        }
+        .input:focus {
+            outline: none;
+            border-color: #6366f1;
+        }
+        .input::placeholder {
+            color: #6b7280;
+        }
+        .btn {
+            padding: 10px 20px;
+            border-radius: 8px;
+            font-weight: 500;
+            transition: all 0.2s;
+            cursor: pointer;
+        }
+        .btn-primary {
+            background: #6366f1;
+            color: white;
+        }
+        .btn-primary:hover {
+            background: #818cf8;
+        }
+        .btn-secondary {
+            background: #1f1f2e;
+            color: #9ca3af;
+        }
+        .btn-secondary:hover {
+            background: #2a2a3d;
+            color: #fff;
         }
     </style>
 </head>
 <body class="text-white">
-    <div class="max-w-6xl mx-auto p-6">
+    <div class="max-w-6xl mx-auto px-6 py-8">
         <!-- Header -->
-        <header class="flex justify-between items-center mb-8">
-            <div class="flex items-center gap-3">
-                <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center">
-                    <span class="text-lg font-bold">◆</span>
+        <header class="flex items-center justify-between mb-10">
+            <div class="flex items-center gap-4">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center">
+                    <i data-lucide="hexagon" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-xl font-bold">DAO Dashboard</h1>
-                    <p class="text-xs text-gray-500">Airdrop Tracker</p>
+                    <h1 class="text-2xl font-bold tracking-tight">DAO Dashboard</h1>
+                    <p class="text-gray-500 text-sm">Airdrop Portfolio Tracker</p>
                 </div>
             </div>
-            <div class="flex items-center gap-2">
-                <button onclick="showSettingsModal()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition">
-                    ⚙ Settings
+            <div class="flex items-center gap-3">
+                <button onclick="showSettingsModal()" class="btn btn-secondary flex items-center gap-2">
+                    <i data-lucide="settings" class="w-4 h-4"></i>
+                    Settings
                 </button>
-                <button onclick="selectFolder()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium transition">
-                    Select Data Folder
+                <button onclick="selectFolder()" class="btn btn-primary flex items-center gap-2">
+                    <i data-lucide="folder-open" class="w-4 h-4"></i>
+                    Select Folder
                 </button>
             </div>
         </header>
 
-        <!-- Treasury Balance -->
-        <div class="gradient-border rounded-2xl p-6 mb-6 glow">
+        <!-- Treasury Stats -->
+        <div class="card p-6 mb-6 glow-accent">
             <div class="flex items-center justify-between">
                 <div>
-                    <p class="text-gray-400 text-sm mb-1">Treasury Balance</p>
-                    <p id="total-balance" class="text-4xl font-bold">$0</p>
+                    <div class="flex items-center gap-2 mb-2">
+                        <i data-lucide="wallet" class="w-4 h-4 text-indigo-400"></i>
+                        <span class="text-gray-400 text-sm font-medium">Treasury Balance</span>
+                    </div>
+                    <p id="total-balance" class="text-5xl font-bold tracking-tight">$0</p>
                 </div>
                 <div class="text-right">
-                    <p class="text-gray-400 text-sm mb-1">Wallets</p>
-                    <p id="wallet-count" class="text-2xl font-bold text-indigo-400">0</p>
+                    <div class="flex items-center justify-end gap-2 mb-2">
+                        <i data-lucide="layers" class="w-4 h-4 text-purple-400"></i>
+                        <span class="text-gray-400 text-sm">Projects</span>
+                    </div>
+                    <p id="project-count" class="text-3xl font-bold text-purple-400">0</p>
                 </div>
             </div>
         </div>
 
         <!-- Main Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-            <!-- Projects List -->
-            <div class="bg-[#141419] rounded-2xl p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold">Projects</h2>
-                    <button onclick="showAddProjectModal()" class="text-indigo-400 hover:text-indigo-300 text-sm">+ Add</button>
+            <!-- Projects -->
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="rocket" class="w-5 h-5 text-indigo-400"></i>
+                        <h2 class="text-lg font-semibold">Projects</h2>
+                    </div>
+                    <button onclick="showAddProjectModal()" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-sm">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        Add
+                    </button>
                 </div>
-                <div id="projects-list" class="space-y-3">
-                    <p class="text-gray-500 text-sm">No projects yet</p>
+                <div id="projects-list" class="space-y-3 max-h-80 overflow-y-auto pr-2">
+                    <p class="text-gray-500 text-sm py-4 text-center">No projects yet</p>
                 </div>
             </div>
 
-            <!-- Activity Feed -->
-            <div class="bg-[#141419] rounded-2xl p-6">
-                <div class="flex justify-between items-center mb-4">
-                    <h2 class="text-lg font-semibold">Activity</h2>
-                    <button onclick="showAddActivityModal()" class="text-indigo-400 hover:text-indigo-300 text-sm">+ Add</button>
+            <!-- Activity -->
+            <div class="card p-6">
+                <div class="flex items-center justify-between mb-6">
+                    <div class="flex items-center gap-2">
+                        <i data-lucide="activity" class="w-5 h-5 text-emerald-400"></i>
+                        <h2 class="text-lg font-semibold">Activity</h2>
+                    </div>
+                    <button onclick="showAddActivityModal()" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-sm">
+                        <i data-lucide="plus" class="w-4 h-4"></i>
+                        Add
+                    </button>
                 </div>
-                <div id="activity-feed" class="space-y-3 max-h-80 overflow-y-auto">
-                    <p class="text-gray-500 text-sm">No activity yet</p>
+                <div id="activity-feed" class="space-y-3 max-h-80 overflow-y-auto pr-2">
+                    <p class="text-gray-500 text-sm py-4 text-center">No activity yet</p>
                 </div>
-            </div>
-        </div>
-
-        <!-- Wallets Table -->
-        <div class="mt-6 bg-[#141419] rounded-2xl p-6">
-            <div class="flex justify-between items-center mb-4">
-                <h2 class="text-lg font-semibold">Wallets</h2>
-                <button onclick="showAddWalletModal()" class="text-indigo-400 hover:text-indigo-300 text-sm">+ Add</button>
-            </div>
-            <div class="overflow-x-auto">
-                <table class="w-full">
-                    <thead>
-                        <tr class="text-gray-500 text-xs uppercase">
-                            <th class="text-left pb-3">Label</th>
-                            <th class="text-left pb-3">Address</th>
-                            <th class="text-left pb-3">Network</th>
-                            <th class="text-right pb-3">Balance</th>
-                            <th class="text-right pb-3"></th>
-                        </tr>
-                    </thead>
-                    <tbody id="wallets-table" class="text-sm">
-                        <tr><td colspan="5" class="py-4 text-gray-500">No wallets</td></tr>
-                    </tbody>
-                </table>
             </div>
         </div>
     </div>
 
     <!-- Modal -->
-    <div id="modal" class="fixed inset-0 bg-black/80 hidden items-center justify-center z-50">
-        <div class="bg-[#141419] rounded-2xl p-6 w-full max-w-md mx-4 gradient-border">
-            <h3 id="modal-title" class="text-lg font-semibold mb-4">Modal</h3>
+    <div id="modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="card p-6 w-full max-w-md mx-4">
+            <div class="flex items-center justify-between mb-6">
+                <h3 id="modal-title" class="text-lg font-semibold">Modal</h3>
+                <button onclick="hideModal()" class="text-gray-500 hover:text-white">
+                    <i data-lucide="x" class="w-5 h-5"></i>
+                </button>
+            </div>
             <div id="modal-content"></div>
         </div>
     </div>
 
     <script src="app.js"></script>
+    <script>
+        lucide.createIcons();
+    </script>
 </body>
 </html>
