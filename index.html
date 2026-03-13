@@ -1,126 +1,240 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="zh-CN">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>DAO Dashboard</title>
+    <title>DAO 仪表盘</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=DM+Sans:ital,opsz,wght@0,9..40,400;0,9..40,500;0,9..40,600;0,9..40,700;1,9..40,400&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Noto+Sans+SC:wght@300;400;500;600;700&display=swap" rel="stylesheet">
     <script src="https://unpkg.com/lucide@latest"></script>
     <script>
         tailwind.config = {
             theme: {
                 extend: {
                     fontFamily: {
-                        sans: ['DM Sans', 'sans-serif'],
+                        sans: ['Noto Sans SC', 'sans-serif'],
                     },
                     colors: {
-                        surface: '#0d0d12',
-                        card: '#14141b',
-                        border: '#1f1f2e',
-                        accent: '#6366f1',
-                        'accent-hover': '#818cf8',
+                        primary: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            200: '#bae6fd',
+                            300: '#7dd3fc',
+                            400: '#38bdf8',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                            800: '#075985',
+                            900: '#0c4a6e',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out',
+                        'slide-up': 'slideUp 0.4s ease-out',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(10px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
                     }
                 }
             }
         }
     </script>
     <style>
+        * {
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
+        }
+
         body {
-            background: #0d0d12;
-            min-height: 100vh;
+            background: #fafbfc;
+            font-family: 'Noto Sans SC', -apple-system, BlinkMacSystemFont, sans-serif;
+            letter-spacing: -0.01em;
         }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.95);
+            backdrop-filter: blur(20px);
+            -webkit-backdrop-filter: blur(20px);
+        }
+
         .card {
-            background: #14141b;
-            border: 1px solid #1f1f2e;
-            border-radius: 16px;
+            background: white;
+            border-radius: 24px;
+            box-shadow: 0 1px 3px rgba(0, 0, 0, 0.04), 0 4px 12px rgba(0, 0, 0, 0.03);
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
         }
-        .glow-accent {
-            box-shadow: 0 0 60px rgba(99, 102, 241, 0.15);
+
+        .card:hover {
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.02), 0 12px 24px rgba(0, 0, 0, 0.06);
+            transform: translateY(-2px);
         }
+
+        .hero-card {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            box-shadow: 0 8px 32px rgba(102, 126, 234, 0.25);
+        }
+
         .input {
-            background: #0d0d12;
-            border: 1px solid #1f1f2e;
-            border-radius: 8px;
-            color: #fff;
-            padding: 10px 14px;
+            background: #f8fafc;
+            border: 1px solid #e2e8f0;
+            border-radius: 12px;
+            color: #1e293b;
+            padding: 14px 16px;
             width: 100%;
-            transition: border-color 0.2s;
+            font-size: 15px;
+            transition: all 0.2s;
         }
+
         .input:focus {
             outline: none;
-            border-color: #6366f1;
+            border-color: #667eea;
+            box-shadow: 0 0 0 4px rgba(102, 126, 234, 0.1);
+            background: white;
         }
+
         .input::placeholder {
-            color: #6b7280;
+            color: #94a3b8;
         }
+
         .btn {
-            padding: 10px 20px;
-            border-radius: 8px;
+            padding: 14px 24px;
+            border-radius: 14px;
             font-weight: 500;
+            font-size: 15px;
             transition: all 0.2s;
             cursor: pointer;
+            border: none;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
         }
+
         .btn-primary {
-            background: #6366f1;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
             color: white;
+            box-shadow: 0 4px 12px rgba(102, 126, 234, 0.25);
         }
+
         .btn-primary:hover {
-            background: #818cf8;
+            transform: translateY(-1px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.35);
         }
+
         .btn-secondary {
-            background: #1f1f2e;
-            color: #9ca3af;
+            background: #f1f5f9;
+            color: #475569;
         }
+
         .btn-secondary:hover {
-            background: #2a2a3d;
-            color: #fff;
+            background: #e2e8f0;
+            color: #1e293b;
+        }
+
+        .status-badge {
+            padding: 6px 14px;
+            border-radius: 20px;
+            font-size: 13px;
+            font-weight: 500;
+        }
+
+        .status-researching {
+            background: #f1f5f9;
+            color: #64748b;
+        }
+
+        .status-active {
+            background: #dcfce7;
+            color: #16a34a;
+        }
+
+        .status-claimed {
+            background: #ede9fe;
+            color: #7c3aed;
+        }
+
+        .status-missed {
+            background: #fee2e2;
+            color: #dc2626;
+        }
+
+        .animate-in {
+            animation: slideUp 0.4s ease-out forwards;
+            opacity: 0;
+        }
+
+        .animate-delay-1 { animation-delay: 0.1s; }
+        .animate-delay-2 { animation-delay: 0.2s; }
+        .animate-delay-3 { animation-delay: 0.3s; }
+
+        ::-webkit-scrollbar {
+            width: 6px;
+        }
+
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 3px;
+        }
+
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
         }
     </style>
 </head>
-<body class="text-white">
-    <div class="max-w-6xl mx-auto px-6 py-8">
+<body class="text-slate-800">
+    <div class="max-w-5xl mx-auto px-6 py-10">
         <!-- Header -->
-        <header class="flex items-center justify-between mb-10">
+        <header class="flex items-center justify-between mb-10 animate-in">
             <div class="flex items-center gap-4">
-                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center">
+                <div class="w-12 h-12 rounded-2xl bg-gradient-to-br from-indigo-500 via-purple-500 to-pink-500 flex items-center justify-center shadow-lg">
                     <i data-lucide="hexagon" class="w-6 h-6 text-white"></i>
                 </div>
                 <div>
-                    <h1 class="text-2xl font-bold tracking-tight">DAO Dashboard</h1>
-                    <p class="text-gray-500 text-sm">Airdrop Portfolio Tracker</p>
+                    <h1 class="text-2xl font-semibold text-slate-900 tracking-tight">DAO 仪表盘</h1>
+                    <p class="text-slate-500 text-sm">空投项目追踪器</p>
                 </div>
             </div>
             <div class="flex items-center gap-3">
-                <button onclick="showSettingsModal()" class="btn btn-secondary flex items-center gap-2">
+                <button onclick="showSettingsModal()" class="btn btn-secondary">
                     <i data-lucide="settings" class="w-4 h-4"></i>
-                    Settings
+                    设置
                 </button>
-                <button onclick="selectFolder()" class="btn btn-primary flex items-center gap-2">
+                <button onclick="selectFolder()" class="btn btn-primary">
                     <i data-lucide="folder-open" class="w-4 h-4"></i>
-                    Select Folder
+                    选择数据文件夹
                 </button>
             </div>
         </header>
 
-        <!-- Treasury Stats -->
-        <div class="card p-6 mb-6 glow-accent">
-            <div class="flex items-center justify-between">
+        <!-- Treasury Hero -->
+        <div class="hero-card rounded-3xl p-8 mb-8 text-white animate-in animate-delay-1">
+            <div class="flex items-end justify-between">
                 <div>
-                    <div class="flex items-center gap-2 mb-2">
-                        <i data-lucide="wallet" class="w-4 h-4 text-indigo-400"></i>
-                        <span class="text-gray-400 text-sm font-medium">Treasury Balance</span>
+                    <div class="flex items-center gap-2 mb-3 opacity-90">
+                        <i data-lucide="wallet" class="w-5 h-5"></i>
+                        <span class="text-sm font-medium">资金池余额</span>
                     </div>
-                    <p id="total-balance" class="text-5xl font-bold tracking-tight">$0</p>
+                    <p id="total-balance" class="text-5xl font-semibold tracking-tight">$0</p>
                 </div>
-                <div class="text-right">
+                <div class="text-right opacity-90">
                     <div class="flex items-center justify-end gap-2 mb-2">
-                        <i data-lucide="layers" class="w-4 h-4 text-purple-400"></i>
-                        <span class="text-gray-400 text-sm">Projects</span>
+                        <i data-lucide="layers" class="w-4 h-4"></i>
+                        <span class="text-sm">项目数量</span>
                     </div>
-                    <p id="project-count" class="text-3xl font-bold text-purple-400">0</p>
+                    <p id="project-count" class="text-3xl font-semibold">0</p>
                 </div>
             </div>
         </div>
@@ -128,47 +242,51 @@
         <!-- Main Grid -->
         <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
             <!-- Projects -->
-            <div class="card p-6">
+            <div class="card p-6 animate-in animate-delay-2">
                 <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="rocket" class="w-5 h-5 text-indigo-400"></i>
-                        <h2 class="text-lg font-semibold">Projects</h2>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-indigo-500 to-purple-500 flex items-center justify-center">
+                            <i data-lucide="rocket" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <h2 class="text-lg font-semibold text-slate-900">项目</h2>
                     </div>
-                    <button onclick="showAddProjectModal()" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-sm">
+                    <button onclick="showAddProjectModal()" class="text-indigo-600 hover:text-indigo-700 flex items-center gap-1 text-sm font-medium">
                         <i data-lucide="plus" class="w-4 h-4"></i>
-                        Add
+                        添加
                     </button>
                 </div>
                 <div id="projects-list" class="space-y-3 max-h-80 overflow-y-auto pr-2">
-                    <p class="text-gray-500 text-sm py-4 text-center">No projects yet</p>
+                    <p class="text-slate-400 text-sm py-8 text-center">暂无项目</p>
                 </div>
             </div>
 
             <!-- Activity -->
-            <div class="card p-6">
+            <div class="card p-6 animate-in animate-delay-3">
                 <div class="flex items-center justify-between mb-6">
-                    <div class="flex items-center gap-2">
-                        <i data-lucide="activity" class="w-5 h-5 text-emerald-400"></i>
-                        <h2 class="text-lg font-semibold">Activity</h2>
+                    <div class="flex items-center gap-3">
+                        <div class="w-10 h-10 rounded-xl bg-gradient-to-br from-emerald-500 to-teal-500 flex items-center justify-center">
+                            <i data-lucide="activity" class="w-5 h-5 text-white"></i>
+                        </div>
+                        <h2 class="text-lg font-semibold text-slate-900">活动记录</h2>
                     </div>
-                    <button onclick="showAddActivityModal()" class="text-indigo-400 hover:text-indigo-300 flex items-center gap-1 text-sm">
+                    <button onclick="showAddActivityModal()" class="text-indigo-600 hover:text-indigo-700 flex items-center gap-1 text-sm font-medium">
                         <i data-lucide="plus" class="w-4 h-4"></i>
-                        Add
+                        添加
                     </button>
                 </div>
-                <div id="activity-feed" class="space-y-3 max-h-80 overflow-y-auto pr-2">
-                    <p class="text-gray-500 text-sm py-4 text-center">No activity yet</p>
+                <div id="activity-feed" class="space-y-2 max-h-80 overflow-y-auto pr-2">
+                    <p class="text-slate-400 text-sm py-8 text-center">暂无活动</p>
                 </div>
             </div>
         </div>
     </div>
 
     <!-- Modal -->
-    <div id="modal" class="fixed inset-0 bg-black/70 backdrop-blur-sm hidden items-center justify-center z-50">
-        <div class="card p-6 w-full max-w-md mx-4">
+    <div id="modal" class="fixed inset-0 bg-slate-900/40 backdrop-blur-sm hidden items-center justify-center z-50">
+        <div class="card p-6 w-full max-w-md mx-4 animate-in">
             <div class="flex items-center justify-between mb-6">
-                <h3 id="modal-title" class="text-lg font-semibold">Modal</h3>
-                <button onclick="hideModal()" class="text-gray-500 hover:text-white">
+                <h3 id="modal-title" class="text-lg font-semibold text-slate-900">弹窗</h3>
+                <button onclick="hideModal()" class="text-slate-400 hover:text-slate-600 p-1">
                     <i data-lucide="x" class="w-5 h-5"></i>
                 </button>
             </div>
