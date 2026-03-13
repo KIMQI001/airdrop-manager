@@ -6,6 +6,7 @@ const state = {
     wallets: [],
     projects: [],
     activities: [],
+    settings: {},
     folderHandle: null
 };
 
@@ -35,7 +36,7 @@ async function selectFolder() {
 }
 
 async function loadData() {
-    const defaults = { wallets: [], projects: [], activities: [] };
+    const defaults = { wallets: [], projects: [], activities: [], settings: {} };
     try {
         const wf = await state.folderHandle.getFileHandle('wallets.json');
         state.wallets = JSON.parse(await (await wf.getFile()).text()).wallets || [];
@@ -50,6 +51,11 @@ async function loadData() {
         const af = await state.folderHandle.getFileHandle('activities.json');
         state.activities = JSON.parse(await (await af.getFile()).text()).activities || [];
     } catch { state.activities = []; save('activities.json', { activities: [] }); }
+
+    try {
+        const sf = await state.folderHandle.getFileHandle('settings.json');
+        state.settings = JSON.parse(await (await sf.getFile()).text());
+    } catch { state.settings = {}; save('settings.json', state.settings); }
 }
 
 async function save(filename, data) {
@@ -148,6 +154,100 @@ function showModal(title, content) {
 function hideModal() {
     document.getElementById('modal').classList.add('hidden');
     document.getElementById('modal').classList.remove('flex');
+}
+
+// Settings
+function showSettingsModal() {
+    showModal('Settings', `
+        <form onsubmit="saveSettings(event)">
+            <div class="mb-4">
+                <label class="block text-sm text-gray-400 mb-2">Binance Watch-Only API Key</label>
+                <input type="text" id="binance-api-key" value="${state.settings.binanceApiKey || ''}" placeholder="Enter API key" class="w-full bg-[#1a1a21] border border-gray-700 rounded-lg px-4 py-2 text-white">
+                <p class="text-xs text-gray-500 mt-1">Create a watch-only API from Binance account</p>
+            </div>
+            <div class="flex gap-2">
+                <button type="button" onclick="hideModal()" class="flex-1 py-2 bg-gray-800 rounded-lg hover:bg-gray-700">Cancel</button>
+                <button type="button" onclick="fetchBinanceBalance()" class="flex-1 py-2 bg-emerald-600 rounded-lg hover:bg-emerald-500">Fetch Balance</button>
+                <button type="submit" class="flex-1 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-500">Save</button>
+            </div>
+        </form>
+    `);
+}
+
+async function saveSettings(e) {
+    e.preventDefault();
+    state.settings.binanceApiKey = document.getElementById('binance-api-key').value;
+    await save('settings.json', state.settings);
+    await log('settings_updated', 'Settings saved');
+    hideModal();
+}
+
+async function fetchBinanceBalance() {
+    const apiKey = document.getElementById('binance-api-key').value;
+    if (!apiKey) {
+        alert('Please enter a Binance API key');
+        return;
+    }
+    try {
+        const res = await fetch(`https://api.binance.com/api/v3/account?recvWindow=5000`, {
+            headers: { 'X-MBX-APIKEY': apiKey }
+        });
+        if (!res.ok) throw new Error('API request failed');
+        const data = await res.json();
+        const total = data.balances.reduce((sum, b) => {
+            const free = parseFloat(b.free) || 0;
+            const locked = parseFloat(b.locked) || 0;
+            return sum + free + locked;
+        }, 0);
+        alert(`Total balance: ${total.toFixed(8)} BNB (estimated value not included)`);
+    } catch (err) {
+        alert('Failed to fetch balance. Check API key and try again.');
+    }
+}
+
+// Activity
+function showAddActivityModal() {
+    showModal('Add Activity', `
+        <form onsubmit="saveActivity(event)">
+            <select id="act-type" class="w-full bg-[#1a1a21] border border-gray-700 rounded-lg px-4 py-2 mb-3 text-white">
+                <option value="deposit">Deposit</option>
+                <option value="withdraw">Withdraw</option>
+                <option value="transfer">Transfer</option>
+            </select>
+            <input type="number" id="act-amount" placeholder="Amount" step="0.0001" required class="w-full bg-[#1a1a21] border border-gray-700 rounded-lg px-4 py-2 mb-3 text-white">
+            <input type="text" id="act-token" placeholder="Token (e.g. ETH, BNB)" required class="w-full bg-[#1a1a21] border border-gray-700 rounded-lg px-4 py-2 mb-3 text-white">
+            <input type="date" id="act-date" required class="w-full bg-[#1a1a21] border border-gray-700 rounded-lg px-4 py-2 mb-3 text-white">
+            <textarea id="act-notes" placeholder="Notes (optional)" rows="2" class="w-full bg-[#1a1a21] border border-gray-700 rounded-lg px-4 py-2 mb-3 text-white"></textarea>
+            <div class="flex gap-2">
+                <button type="button" onclick="hideModal()" class="flex-1 py-2 bg-gray-800 rounded-lg hover:bg-gray-700">Cancel</button>
+                <button type="submit" class="flex-1 py-2 bg-indigo-600 rounded-lg hover:bg-indigo-500">Save</button>
+            </div>
+        </form>
+    `);
+}
+
+async function saveActivity(e) {
+    e.preventDefault();
+    const type = document.getElementById('act-type').value;
+    const amount = document.getElementById('act-amount').value;
+    const token = document.getElementById('act-token').value;
+    const date = document.getElementById('act-date').value;
+    const notes = document.getElementById('act-notes').value;
+
+    const icons = { deposit: '↓', withdraw: '↑', transfer: '⇄' };
+    const desc = `${icons[type]} ${amount} ${token}${notes ? ' - ' + notes : ''}`;
+
+    state.activities.unshift({
+        id: generateId(),
+        type: 'manual',
+        desc,
+        time: date + 'T00:00:00.000Z'
+    });
+
+    await save('activities.json', { activities: state.activities });
+    await log('activity_added', `Added ${type}: ${amount} ${token}`);
+    hideModal();
+    renderActivity();
 }
 
 // Projects
@@ -278,6 +378,8 @@ async function deleteWallet(id) {
 // Init
 window.showAddProjectModal = showAddProjectModal;
 window.showAddWalletModal = showAddWalletModal;
+window.showAddActivityModal = showAddActivityModal;
+window.showSettingsModal = showSettingsModal;
 window.selectFolder = selectFolder;
 window.hideModal = hideModal;
 window.saveProject = saveProject;
@@ -286,3 +388,6 @@ window.editProject = editProject;
 window.updateProject = updateProject;
 window.deleteProject = deleteProject;
 window.deleteWallet = deleteWallet;
+window.saveSettings = saveSettings;
+window.saveActivity = saveActivity;
+window.fetchBinanceBalance = fetchBinanceBalance;

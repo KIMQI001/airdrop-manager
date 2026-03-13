@@ -48,9 +48,14 @@
                     <p class="text-xs text-gray-500">Airdrop Tracker</p>
                 </div>
             </div>
-            <button onclick="selectFolder()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium transition">
-                Select Data Folder
-            </button>
+            <div class="flex items-center gap-2">
+                <button onclick="showSettingsModal()" class="px-4 py-2 bg-gray-800 hover:bg-gray-700 rounded-lg text-sm font-medium transition">
+                    ⚙ Settings
+                </button>
+                <button onclick="selectFolder()" class="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 rounded-lg text-sm font-medium transition">
+                    Select Data Folder
+                </button>
+            </div>
         </header>
 
         <!-- Treasury Balance -->
@@ -82,7 +87,10 @@
 
             <!-- Activity Feed -->
             <div class="bg-[#141419] rounded-2xl p-6">
-                <h2 class="text-lg font-semibold mb-4">Activity</h2>
+                <div class="flex justify-between items-center mb-4">
+                    <h2 class="text-lg font-semibold">Activity</h2>
+                    <button onclick="showAddActivityModal()" class="text-indigo-400 hover:text-indigo-300 text-sm">+ Add</button>
+                </div>
                 <div id="activity-feed" class="space-y-3 max-h-80 overflow-y-auto">
                     <p class="text-gray-500 text-sm">No activity yet</p>
                 </div>
